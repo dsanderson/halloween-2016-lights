@@ -1,10 +1,16 @@
 import serial, copy
+import serial.tools.list_ports
 
 class Visualizer():
     def __init__(self,debug=False):
         self.debug = debug
         if not self.debug:
-            self.ser = serial.Serial('/dev/ttyACM0', 38400)
+            ports = list(serial.tools.list_ports.comports())
+            for p in ports:
+                print p
+                if "Arduino" in p[2] or "2341:0042" in p[2]:
+                    port_str = p[0]
+            self.ser = serial.Serial(port_str, 38400)#'/dev/ttyACM0', 38400)
         else:
             print "Launching with debug comms"
         self.state = [(0,0,0),(0,0,0),(0,0,0),(0,0,0),(0,0,0),(0,0,0),(0,0,0),(0,0,0)]
@@ -12,7 +18,7 @@ class Visualizer():
 
     def write_state(self):
         to_write = self.diff_state()
-        for bar in diff:
+        for bar in to_write:
             self.write_bar(bar[0],bar[1])
         self.show()
 

@@ -1,5 +1,5 @@
 import comms, audio, ui
-import colorsys, time
+import colorsys, time, sys
 
 def update_colors(spectrogram,vis,fps):
     current_hues = [colorsys.rgb_to_hsv(*s)[0] for s in vis.state]
@@ -12,22 +12,30 @@ def update_colors(spectrogram,vis,fps):
     new_hues = [(h+vel[i])%1.0 for i, h in enumerate(current_hues)]
     new_colors = [colorsys.hsv_to_rgb(h,1.0,1.0) for h in new_hues]
     vis.state = new_colors
+    vis.write_state()
     return scale
 
 if __name__ == '__main__':
     disp = True
-    vis = comms.Visualizer(debug=True)
+    vis = comms.Visualizer(debug=False)
     rec = audio.Recorder()
     fps = 106.0
     spf = 1.0/fps
     if disp:
         display = ui.Display()
     while True:
+        buff = ''
+        sys.stdin.flush()
+        while len(buff)<100:
+            buff += sys.stdin.read(1)
+        #if len(buff)>100:
+        #    buff = buff[-100:]
+        rec.update_samples(buff)
         time_0 = time.time()
-        spectrogram = rec.get_spectrum()
+        spectrogram, l = rec.get_spectrum()
         scale = update_colors(spectrogram,vis,fps)
         if disp:
-            display.draw_state(fps,vis,spectrogram)
+            display.draw_state(fps,vis,spectrogram,l)
         #print vis.state
         #limit frame rate
         #while fps>110:

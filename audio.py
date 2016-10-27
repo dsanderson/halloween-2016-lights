@@ -5,37 +5,41 @@ import math
 
 class Recorder():
     def __init__(self,device_name=None,verbose=False):
-        if device_name==None:
-            device_name='default'
-        if verbose:
-            print "Initializing recoding device '{}'".format(device_name)
-        self.device = alsaaudio.PCM(type=alsaaudio.PCM_CAPTURE,mode=alsaaudio.PCM_NONBLOCK,device=device_name)
-        self.device.setchannels(1)
-        self.rate = 44100
-        self.sample_size = 22000#44100
-        self.device.setperiodsize(100)
+        #if device_name==None:
+        #    device_name=u'dsnoop:CARD=C170,DEV=0'#u'dmix:CARD=C170,DEV=0'#u'sysdefault:CARD=C170'
+        #if verbose:
+        #    print "Initializing recoding device '{}'".format(device_name)
+        #self.device = alsaaudio.PCM(type=alsaaudio.PCM_CAPTURE,mode=alsaaudio.PCM_NONBLOCK,device=device_name)
+        #self.device.setchannels(1)
+        self.rate = 8000
+        self.sample_size = 8000#44100
+        #self.device.setperiodsize(64)
         self.samples = []
-        self.load_data()
+        #self.load_data()
 
-    def update_samples(self):
-        frame = self.device.read()
-        if frame[0]==0:
-            return False
-        data = unpack('<'+'h'*frame[0],frame[1])
+    def update_samples(self,sample):
+        #frame = self.device.read()
+        #frame_len = len(frame[1])#frame[0]
+        #print frame_len
+        #if frame_len<=0:
+        #    return False, frame_len
+        #print frame
+        data = unpack('<'+'h'*(len(sample)/2),sample)
         data = [d/float(2^16) for d in data]
         for datum in data:
             self.samples.append(datum)
         if len(self.samples)>self.sample_size:
             self.samples = self.samples[-1*self.rate:]
             #print len(self.samples)
-        return True
+        return True, len(data)
 
     def load_data(self):
         while not len(self.samples)>=self.sample_size:
-            updated = self.update_samples()
+            updated, l = self.update_samples()
 
     def get_spectrum(self):
-        updated = self.update_samples()
+        #updated, l = self.update_samples()
+        l=0
         fft = np.fft.fft(self.samples)
         #normalize
         fft = fft/float(len(self.samples))
@@ -55,7 +59,7 @@ class Recorder():
         while i<len(fft):
             buckets.append(max(fft[i:min([i+size,len(fft)-1])]))
             i+=size
-        return buckets
+        return buckets, l
 
 def test_Recorder():
     r = Recorder(verbose=True)

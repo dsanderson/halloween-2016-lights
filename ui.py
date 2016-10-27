@@ -21,11 +21,12 @@ class Display():
         atexit.register(self.screen.keypad, 0)
         atexit.register(curses.nocbreak)
 
-    def draw_state(self, fps, vis, spectrogram):
+    def draw_state(self, fps, vis, spectrogram, frame_len):
         #self.screen.clear()
         #self.screen.border()
         self.screen.addstr(2,2,"Spectrogram Visualizer")
         self.screen.addstr(3,2,"Currently at {} fps".format(int(fps)))
+        self.screen.addstr(4,2,"Frame len {}".format(frame_len))
         bar_x = 2
         bar_spacing = 3
         bar_y = 15
