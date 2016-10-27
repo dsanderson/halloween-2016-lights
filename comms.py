@@ -37,6 +37,9 @@ class Visualizer():
             self.ser.write(chr(int(255*color[1])))
             self.ser.write(chr(int(255*color[2])))
 
+    def zero_state(self):
+        self.state = [(0,0,0),(0,0,0),(0,0,0),(0,0,0),(0,0,0),(0,0,0),(0,0,0),(0,0,0)]
+
     def show(self):
         if not self.debug:
             self.ser.write(chr(255))
