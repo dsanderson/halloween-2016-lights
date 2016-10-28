@@ -4,7 +4,7 @@ import numpy as np
 import math
 
 class Recorder():
-    def __init__(self,device_name=None,verbose=False):
+    def __init__(self,device_name=None,verbose=False,sample_size=8000):
         #if device_name==None:
         #    device_name=u'dsnoop:CARD=C170,DEV=0'#u'dmix:CARD=C170,DEV=0'#u'sysdefault:CARD=C170'
         #if verbose:
@@ -12,7 +12,7 @@ class Recorder():
         #self.device = alsaaudio.PCM(type=alsaaudio.PCM_CAPTURE,mode=alsaaudio.PCM_NONBLOCK,device=device_name)
         #self.device.setchannels(1)
         self.rate = 8000
-        self.sample_size = 8000#44100
+        self.sample_size = 100#8000#44100
         #self.device.setperiodsize(64)
         self.samples = []
         #self.load_data()
@@ -36,6 +36,10 @@ class Recorder():
     def load_data(self):
         while not len(self.samples)>=self.sample_size:
             updated, l = self.update_samples()
+
+    def get_energy(self):
+        e = sum([s**2 for s in self.samples])
+        return e
 
     def get_spectrum(self):
         #updated, l = self.update_samples()

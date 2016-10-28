@@ -21,8 +21,8 @@ class Display():
         atexit.register(self.screen.keypad, 0)
         atexit.register(curses.nocbreak)
 
-    def draw_state(self, fps, vis, spectrogram, frame_len):
-        #self.screen.clear()
+    def draw_state(self, fps, vis, spectrogram, frame_len, bar_i):
+        self.screen.clear()
         #self.screen.border()
         self.screen.addstr(2,2,"Spectrogram Visualizer")
         self.screen.addstr(3,2,"Currently at {} fps".format(int(fps)))
@@ -32,20 +32,21 @@ class Display():
         bar_y = 15
         bar_height = 10
         for i, c in enumerate(vis.state):
-            h = colorsys.rgb_to_hsv(*c)[0]
-            #round color to nearest existing shade
-            hi = int(h*6+0.5)
-            for j in xrange(bar_height):
-                #pass
-                y = int(bar_y-j)
-                x = int(bar_x+bar_spacing*i)
-                self.screen.addstr(y,x," ",curses.color_pair(hi+1))
-            spec_height = int(bar_height*min([spectrogram[i],1.0]))
-            for k in xrange(bar_height):
-                y = int(bar_y-k)
-                x = int(bar_x+bar_spacing*i+1)
-                if k<spec_height:
-                    self.screen.addstr(y,x," ",curses.color_pair(3))
-                else:
-                    self.screen.addstr(y,x," ",curses.color_pair(0))
+            if i==bar_i:
+                h = colorsys.rgb_to_hsv(*c)[0]
+                #round color to nearest existing shade
+                hi = int(h*6+0.5)
+                for j in xrange(bar_height):
+                    #pass
+                    y = int(bar_y-j)
+                    x = int(bar_x+bar_spacing*i)
+                    self.screen.addstr(y,x," ",curses.color_pair(hi+1))
+                spec_height = int(bar_height*min([spectrogram[i],1.0]))
+                for k in xrange(bar_height):
+                    y = int(bar_y-k)
+                    x = int(bar_x+bar_spacing*i+1)
+                    if k<spec_height:
+                        self.screen.addstr(y,x," ",curses.color_pair(3))
+                    else:
+                        self.screen.addstr(y,x," ",curses.color_pair(0))
         self.screen.refresh()
