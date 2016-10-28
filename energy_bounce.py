@@ -12,6 +12,8 @@ def update_colors(is_beat,i,direc,vis,fps):
     new_colors = [(0.0,0.0,0.0) for h in xrange(8)]
     new_colors[i]=colorsys.hsv_to_rgb(new_hue,1.0,1.0)
     vis.state = new_colors
+    if not disp:
+		print vis.state
     vis.write_state()
     return i, direc
 
@@ -23,8 +25,8 @@ def is_beat(energies, energy):
     var_prev = (energies[-1]-avg_energy)**2
     if var_energy == 0.0:
         return False
-    if not disp:
-        print var_energy,var_e/var_energy,var_prev/var_energy
+    #if not disp:
+    #    print var_energy,var_e/var_energy,var_prev/var_energy
     if ((var_prev/var_energy)<thresh) and ((var_e/var_energy)>thresh):
         if not disp:
             print True
@@ -34,13 +36,13 @@ def is_beat(energies, energy):
 
 if __name__ == '__main__':
     disp = True
-    vis = comms.Visualizer(debug=True)
+    vis = comms.Visualizer(debug=False)
     rec = audio.Recorder(sample_size=100)
     fps = 106.0
     spf = 1.0/fps
     bar_i = 1
     direc = 1
-    n_energies = 50
+    n_energies = 20
     energies = [0.0 for i in xrange(n_energies)]
     if disp:
         display = ui.Display()

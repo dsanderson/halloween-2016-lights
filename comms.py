@@ -17,7 +17,8 @@ class Visualizer():
         self.old_state = copy.deepcopy(self.state)
 
     def write_state(self):
-        to_write = self.diff_state()
+        to_write = [(i,c) for i,c in enumerate(self.state)]#self.diff_state()
+        #print len(to_write)
         for bar in to_write:
             self.write_bar(bar[0],bar[1])
         self.show()
@@ -31,6 +32,7 @@ class Visualizer():
         return diff
 
     def write_bar(self,i,color):
+        #print i,color
         if not self.debug:
             self.ser.write(chr(i))
             self.ser.write(chr(int(255*color[0])))
@@ -42,6 +44,7 @@ class Visualizer():
 
     def show(self):
         if not self.debug:
+            #print "Displaying"
             self.ser.write(chr(255))
             self.ser.write(chr(255))
             self.ser.write(chr(255))

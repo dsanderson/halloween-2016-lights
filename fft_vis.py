@@ -16,7 +16,7 @@ def update_colors(spectrogram,vis,fps):
     return scale
 
 if __name__ == '__main__':
-    disp = True
+    disp = False
     vis = comms.Visualizer(debug=False)
     rec = audio.Recorder()
     fps = 106.0
