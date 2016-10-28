@@ -13,12 +13,12 @@ def update_colors(is_beat,i,direc,vis,fps):
     new_colors[i]=colorsys.hsv_to_rgb(new_hue,1.0,1.0)
     vis.state = new_colors
     if not disp:
-		print vis.state
+        print vis.state
     vis.write_state()
     return i, direc
 
 def is_beat(energies, energy):
-    thresh = 2
+    thresh = 3.0
     avg_energy = sum(energies)/float(len(energies))
     var_energy = sum((e-avg_energy)**2 for e in energies)/float(len(energies))
     var_e = (energy-avg_energy)**2
@@ -37,16 +37,17 @@ def is_beat(energies, energy):
 if __name__ == '__main__':
     disp = True
     vis = comms.Visualizer(debug=False)
-    rec = audio.Recorder(sample_size=100)
+    rec = audio.Recorder(sample_size=1000)
     fps = 106.0
     spf = 1.0/fps
     bar_i = 1
     direc = 1
-    n_energies = 20
+    n_energies = 30
     energies = [0.0 for i in xrange(n_energies)]
     if disp:
         display = ui.Display()
     while True:
+        time_0 = time.time()
         buff = ''
         sys.stdin.flush()
         while len(buff)<1000:
@@ -54,7 +55,6 @@ if __name__ == '__main__':
         #if len(buff)>100:
         #    buff = buff[-100:]
         rec.update_samples(buff)
-        time_0 = time.time()
         avg_energy = sum(energies)/float(n_energies)
         var_energy = sum((e-avg_energy)**2 for e in energies)/float(n_energies)
         energy = rec.get_energy()
@@ -65,7 +65,7 @@ if __name__ == '__main__':
         var_e = (energy-avg_energy)**2
         energies = energies[1:]
         energies.append(energy)
-        spectrogram = [0.5,var_e/(0.001+2.0*var_energy),0,0,0,0,0,0]
+        spectrogram = [var_e/(0.001+2.0*var_energy) for tmp in xrange(8)]
         l=0
         if disp:
             display.draw_state(fps,vis,spectrogram,l,bar_i)
